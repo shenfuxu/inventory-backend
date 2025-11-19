@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const sqlite3 = require('sqlite3').verbose();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const path = require('path');
+const dotenv = require('dotenv');
 
 // 加载环境变量
 dotenv.config();
@@ -130,6 +132,38 @@ db.serialize(() => {
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
   `);
+  
+  // 创建初始管理员用户
+  const adminEmail = '361206310@qq.com';
+  const adminPassword = 'Axuan20160304!';
+  
+  // 检查管理员用户是否存在
+  db.get('SELECT id FROM users WHERE email = ?', [adminEmail], (err, row) => {
+    if (err) {
+      console.error('检查用户失败:', err);
+    } else if (!row) {
+      // 创建管理员用户
+      bcrypt.hash(adminPassword, 10, (err, hash) => {
+        if (err) {
+          console.error('密码加密失败:', err);
+        } else {
+          db.run(
+            'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
+            [adminEmail, hash, '管理员', 'admin'],
+            (err) => {
+              if (err) {
+                console.error('创建管理员用户失败:', err);
+              } else {
+                console.log('✅ 初始管理员用户创建成功');
+              }
+            }
+          );
+        }
+      });
+    } else {
+      console.log('管理员用户已存在');
+    }
+  });
 });
 
 // 导入路由
