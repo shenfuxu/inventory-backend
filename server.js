@@ -20,7 +20,11 @@ app.use(cors({
     // 允许没有origin的请求（比如移动app等）
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app') || origin.includes('netlify.app')) {
+    if (allowedOrigins.indexOf(origin) !== -1 || 
+        origin.includes('vercel.app') || 
+        origin.includes('netlify.app') || 
+        origin.includes('onrender.com') ||
+        origin.includes('render.com')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
