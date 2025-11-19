@@ -38,7 +38,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 初始化数据库
-const db = new sqlite3.Database('./inventory.db');
+// Render 上使用 /tmp 目录，本地使用当前目录
+const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/inventory.db' : './inventory.db';
+const db = new sqlite3.Database(dbPath);
+console.log('Database initialized at:', dbPath);
 
 // 创建数据库表
 db.serialize(() => {
